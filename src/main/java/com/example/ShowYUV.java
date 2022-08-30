@@ -5,15 +5,18 @@ import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * YUVファイルを表示
@@ -27,6 +30,7 @@ public class ShowYUV extends JFrame implements ActionListener {
     static final String FILE_NAME = "File: ";
     static final String FILE_OPEN = "File...";
     static final String PLAY = "Play";
+    static final String DIALOG_TITLE = "YUVファイル選択";
 
     private JPanel panel;
     private JLabel fileNameLabel;
@@ -78,7 +82,18 @@ public class ShowYUV extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        // TODO Auto-generated method stub
-
+        if (e.getSource() == fileOpenButton) {
+            JFileChooser chooser = new JFileChooser();
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("YUVファイル(*.yuv)", "yuv");
+            chooser.setFileFilter(filter);
+            chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            chooser.setDialogTitle(DIALOG_TITLE);
+            int rc = chooser.showOpenDialog(this);
+            if (rc == JFileChooser.APPROVE_OPTION) {
+                File yuvFile = chooser.getSelectedFile();
+                fileNameLabel.setText(FILE_NAME + yuvFile.getPath());
+                playButton.setEnabled(true);
+            }
+        }
     }
 }

@@ -1,7 +1,6 @@
 package com.example;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,6 +14,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 import javax.swing.border.BevelBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -36,6 +36,8 @@ public class ShowYUV extends JFrame implements ActionListener {
     private JLabel fileNameLabel;
     private JButton fileOpenButton;
     private JButton playButton;
+
+    private Timer timer;
 
     public ShowYUV(String title) throws HeadlessException {
         super(title);
@@ -73,6 +75,8 @@ public class ShowYUV extends JFrame implements ActionListener {
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+
+        timer = new Timer(66, this);
     }
 
     public static void main(String[] args) {
@@ -96,6 +100,17 @@ public class ShowYUV extends JFrame implements ActionListener {
                     playButton.setEnabled(true);
                     panel.repaint();
                 }
+            }
+        } else if (e.getSource() == playButton) {
+            playButton.setEnabled(false);
+            fileOpenButton.setEnabled(false);
+            timer.start();
+        } else if (e.getSource() == timer) {
+            if (panel.isDataAvailable()) {
+                panel.repaint();
+            } else {
+                timer.stop();
+                fileOpenButton.setEnabled(true);
             }
         }
     }

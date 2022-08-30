@@ -18,6 +18,10 @@ public class ShowYUVPanel extends JPanel {
         return img.setFile(yuvFile);
     }
 
+    public boolean isDataAvailable() {
+        return img.isDataAvailable();
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);

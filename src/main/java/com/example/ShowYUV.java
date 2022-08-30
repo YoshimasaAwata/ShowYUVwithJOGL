@@ -32,7 +32,7 @@ public class ShowYUV extends JFrame implements ActionListener {
     static final String PLAY = "Play";
     static final String DIALOG_TITLE = "YUVファイル選択";
 
-    private JPanel panel;
+    private ShowYUVPanel panel;
     private JLabel fileNameLabel;
     private JButton fileOpenButton;
     private JButton playButton;
@@ -44,8 +44,8 @@ public class ShowYUV extends JFrame implements ActionListener {
         JPanel borderPanel = new JPanel();
         borderPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 
-        panel = new JPanel();
-        panel.setPreferredSize(new Dimension(CIF_WIDTH, CIF_HEIGHT));
+        panel = new ShowYUVPanel(CIF_WIDTH, CIF_HEIGHT);
+        // panel.setPreferredSize(new Dimension(CIF_WIDTH, CIF_HEIGHT));
         borderPanel.add(panel);
 
         add(borderPanel);
@@ -91,8 +91,11 @@ public class ShowYUV extends JFrame implements ActionListener {
             int rc = chooser.showOpenDialog(this);
             if (rc == JFileChooser.APPROVE_OPTION) {
                 File yuvFile = chooser.getSelectedFile();
-                fileNameLabel.setText(FILE_NAME + yuvFile.getPath());
-                playButton.setEnabled(true);
+                if (panel.setFile(yuvFile)) {
+                    fileNameLabel.setText(FILE_NAME + yuvFile.getPath());
+                    playButton.setEnabled(true);
+                    panel.repaint();
+                }
             }
         }
     }

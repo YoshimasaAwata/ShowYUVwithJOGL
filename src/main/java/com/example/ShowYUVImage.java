@@ -88,11 +88,13 @@ public class ShowYUVImage extends BufferedImage {
         return;
     }
 
-    public void setNextFrame() {
+    public boolean setNextFrame() {
         if (dataAvailable) {
             transYUV2RGB();
             setRGB(0, 0, getWidth(), getHeight(), argb, 0, getWidth());
             readYUV();
+            return true;
         }
+        return false;
     }
 }

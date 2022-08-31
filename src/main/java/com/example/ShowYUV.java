@@ -18,11 +18,14 @@ import javax.swing.Timer;
 import javax.swing.border.BevelBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLEventListener;
+
 /**
  * YUVファイルを表示
  *
  */
-public class ShowYUV extends JFrame implements ActionListener {
+public class ShowYUV extends JFrame implements ActionListener, GLEventListener {
     static final int CIF_WIDTH = 352;
     static final int CIF_HEIGHT = 288;
 
@@ -47,7 +50,7 @@ public class ShowYUV extends JFrame implements ActionListener {
         borderPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 
         panel = new ShowYUVPanel(CIF_WIDTH, CIF_HEIGHT);
-        // panel.setPreferredSize(new Dimension(CIF_WIDTH, CIF_HEIGHT));
+        panel.addGLEventListener(this);
         borderPanel.add(panel);
 
         add(borderPanel);
@@ -113,5 +116,29 @@ public class ShowYUV extends JFrame implements ActionListener {
                 fileOpenButton.setEnabled(true);
             }
         }
+    }
+
+    @Override
+    public void display(GLAutoDrawable arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void dispose(GLAutoDrawable arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void init(GLAutoDrawable arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void reshape(GLAutoDrawable arg0, int arg1, int arg2, int arg3, int arg4) {
+        // TODO Auto-generated method stub
+
     }
 }

@@ -4,12 +4,18 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.io.File;
 
-import javax.swing.JPanel;
+import com.jogamp.opengl.GLCapabilities;
+import com.jogamp.opengl.GLProfile;
+import com.jogamp.opengl.awt.GLJPanel;
 
-public class ShowYUVPanel extends JPanel {
+public class ShowYUVPanel extends GLJPanel {
     private ShowYUVImage img;
 
     public ShowYUVPanel(int width, int height) {
+        GLProfile profile = GLProfile.get(GLProfile.GL3);
+        GLCapabilities cap = new GLCapabilities(profile);
+        setRequestedGLCapabilities(cap);
+
         img = new ShowYUVImage(width, height);
         setPreferredSize(new Dimension(width, height));
     }

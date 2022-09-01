@@ -18,6 +18,7 @@ import javax.swing.Timer;
 import javax.swing.border.BevelBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 
@@ -119,25 +120,25 @@ public class ShowYUV extends JFrame implements ActionListener, GLEventListener {
     }
 
     @Override
-    public void display(GLAutoDrawable arg0) {
-        // TODO Auto-generated method stub
-
+    public void display(GLAutoDrawable drawable) {
+        GL3 gl = drawable.getGL().getGL3();
+        panel.display(gl);
     }
 
     @Override
-    public void dispose(GLAutoDrawable arg0) {
-        // TODO Auto-generated method stub
-
+    public void dispose(GLAutoDrawable drawable) {
+        GL3 gl = drawable.getGL().getGL3();
+        panel.dispose(gl);
     }
 
     @Override
-    public void init(GLAutoDrawable arg0) {
-        // TODO Auto-generated method stub
-
+    public void init(GLAutoDrawable drawable) {
+        GL3 gl = drawable.getGL().getGL3();
+        panel.init(gl);
     }
 
     @Override
-    public void reshape(GLAutoDrawable arg0, int arg1, int arg2, int arg3, int arg4) {
+    public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
         // TODO Auto-generated method stub
 
     }

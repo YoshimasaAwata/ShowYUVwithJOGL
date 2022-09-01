@@ -20,8 +20,8 @@ public class ShowYUVShader {
             "uniform sampler2D textureSampler;\n" +
             "void main(void)\n" +
             "{\n" +
-            // " color = texture(textureSampler, uv);\n" +
-            " color = vec4(1.0, 0.0, 0.0, 1.0);\n" +
+            " color = texture(textureSampler, uv);\n" +
+            // " color = vec4(1.0, 0.0, 0.0, 1.0);\n" +
             "}";
 
     static final String ERROR_VERTEX = "バーテックスシェーダー作成失敗";

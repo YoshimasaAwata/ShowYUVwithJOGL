@@ -28,7 +28,7 @@ public class ShowYUVPanel extends GLJPanel {
     };
 
     private ShowYUVShader shader;
-    private ShowYUVImage img;
+    private ShowYUVTexture texture;
     private IntBuffer vertexBuffer = Buffers.newDirectIntBuffer(1);
     private IntBuffer textureBuffer = Buffers.newDirectIntBuffer(1);
 
@@ -37,16 +37,17 @@ public class ShowYUVPanel extends GLJPanel {
         GLCapabilities cap = new GLCapabilities(profile);
         setRequestedGLCapabilities(cap);
 
-        // img = new ShowYUVImage(width, height);
+        texture = new ShowYUVTexture(width, height);
+
         setPreferredSize(new Dimension(width, height));
     }
 
     public boolean setFile(File yuvFile) {
-        return img.setFile(yuvFile);
+        return texture.setFile(yuvFile);
     }
 
     public boolean isDataAvailable() {
-        return img.isDataAvailable();
+        return texture.isDataAvailable();
     }
 
     public void init(GL3 gl) {
@@ -69,13 +70,15 @@ public class ShowYUVPanel extends GLJPanel {
         gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, textureBuffer.get(0));
         gl.glBufferData(GL3.GL_ARRAY_BUFFER, (TEXTURE_DATA.length * 4),
                 Buffers.newDirectFloatBuffer(TEXTURE_DATA), GL3.GL_STATIC_DRAW);
+
+        texture.init(gl);
     }
 
     public void display(GL3 gl) {
         if (shader != null) {
             gl.glUseProgram(shader.getProgramID());
 
-            // texture.setNextTexture(gl, shader);
+            texture.setNextTexture(gl, shader);
 
             gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
 
@@ -113,11 +116,11 @@ public class ShowYUVPanel extends GLJPanel {
         gl.glDeleteBuffers(1, textureBuffer);
         gl.glDeleteBuffers(1, vertexBuffer);
 
+        texture.dispose(gl);
+
         if (shader != null) {
             shader.DeleteAllObjects(gl);
         }
-
-        // texture.dispose(gl);
     }
 
 }

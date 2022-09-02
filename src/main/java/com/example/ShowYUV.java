@@ -14,13 +14,13 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.Timer;
 import javax.swing.border.BevelBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.util.FPSAnimator;
 
 /**
  * YUVファイルを表示
@@ -41,7 +41,7 @@ public class ShowYUV extends JFrame implements ActionListener, GLEventListener {
     private JButton fileOpenButton;
     private JButton playButton;
 
-    private Timer timer;
+    private FPSAnimator animator;
 
     public ShowYUV(String title) throws HeadlessException {
         super(title);
@@ -80,7 +80,7 @@ public class ShowYUV extends JFrame implements ActionListener, GLEventListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        timer = new Timer(66, this);
+        animator = new FPSAnimator(panel, 15);
     }
 
     public static void main(String[] args) {
@@ -108,14 +108,7 @@ public class ShowYUV extends JFrame implements ActionListener, GLEventListener {
         } else if (e.getSource() == playButton) {
             playButton.setEnabled(false);
             fileOpenButton.setEnabled(false);
-            timer.start();
-        } else if (e.getSource() == timer) {
-            if (panel.isDataAvailable()) {
-                panel.repaint();
-            } else {
-                timer.stop();
-                fileOpenButton.setEnabled(true);
-            }
+            animator.start();
         }
     }
 
@@ -123,6 +116,10 @@ public class ShowYUV extends JFrame implements ActionListener, GLEventListener {
     public void display(GLAutoDrawable drawable) {
         GL3 gl = drawable.getGL().getGL3();
         panel.display(gl);
+        if (panel.isDataAvailable() == false) {
+            animator.stop();
+            fileOpenButton.setEnabled(true);
+        }
     }
 
     @Override

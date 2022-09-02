@@ -1,10 +1,8 @@
 package com.example;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import com.jogamp.common.nio.Buffers;
@@ -18,9 +16,10 @@ public class ShowYUVTexture {
     private byte[] y;
     private byte[] u;
     private byte[] v;
-    private byte[] rgb;
 
-    private IntBuffer textureID = Buffers.newDirectIntBuffer(1);
+    private IntBuffer textureIDY = Buffers.newDirectIntBuffer(1);
+    private IntBuffer textureIDU = Buffers.newDirectIntBuffer(1);
+    private IntBuffer textureIDV = Buffers.newDirectIntBuffer(1);
 
     private FileInputStream inFile = null;
     private boolean dataAvailable = false;
@@ -38,7 +37,6 @@ public class ShowYUVTexture {
         y = new byte[y_size];
         u = new byte[uv_size];
         v = new byte[uv_size];
-        rgb = new byte[y_size * 3];
     }
 
     protected void readYUV() {
@@ -64,41 +62,25 @@ public class ShowYUVTexture {
         return dataAvailable;
     }
 
-    protected byte clip(int n) {
-        int clipped = (n <= 0) ? 0 : ((n >= 0x0FF) ? 0x0FF : n);
-        return (byte) clipped;
-    }
-
-    protected void transYUV2RGB() {
-        for (int h = 0; h < tex_height; h++) {
-            int y_pos = h * tex_width;
-            int uv_pos = (h / 2) * (tex_width / 2);
-
-            for (int w = 0; w < tex_width; w++) {
-                int yi = y[y_pos + w] & 0x0FF;
-                int ui = u[uv_pos + (w / 2)] & 0x0FF;
-                int vi = v[uv_pos + (w / 2)] & 0x0FF;
-
-                double y16 = yi - 16.0;
-                double u128 = ui - 128.0;
-                double v128 = vi - 128.0;
-
-                int r = (int) ((1.164 * y16) + (0.0 * u128) + (1.596 * v128));
-                int g = (int) ((1.164 * y16) + (-0.392 * u128) + (-0.813 * v128));
-                int b = (int) ((1.164 * y16) + (2.017 * u128) + (0.0 * v128));
-                int pos = (y_pos + w) * 3;
-                rgb[pos] = clip(r);
-                rgb[pos + 1] = clip(g);
-                rgb[pos + 2] = clip(b);
-            }
-        }
-
-        return;
-    }
-
     public void init(GL3 gl) {
-        gl.glGenTextures(1, textureID);
-        gl.glBindTexture(GL3.GL_TEXTURE_2D, textureID.get(0));
+        gl.glGenTextures(1, textureIDY);
+        gl.glBindTexture(GL3.GL_TEXTURE_2D, textureIDY.get(0));
+        gl.glPixelStorei(GL3.GL_UNPACK_ALIGNMENT, 1);
+        gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MAG_FILTER,
+                GL3.GL_LINEAR);
+        gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MIN_FILTER,
+                GL3.GL_LINEAR);
+
+        gl.glGenTextures(1, textureIDU);
+        gl.glBindTexture(GL3.GL_TEXTURE_2D, textureIDU.get(0));
+        gl.glPixelStorei(GL3.GL_UNPACK_ALIGNMENT, 1);
+        gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MAG_FILTER,
+                GL3.GL_LINEAR);
+        gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MIN_FILTER,
+                GL3.GL_LINEAR);
+
+        gl.glGenTextures(1, textureIDV);
+        gl.glBindTexture(GL3.GL_TEXTURE_2D, textureIDV.get(0));
         gl.glPixelStorei(GL3.GL_UNPACK_ALIGNMENT, 1);
         gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MAG_FILTER,
                 GL3.GL_LINEAR);
@@ -108,28 +90,58 @@ public class ShowYUVTexture {
 
     public void setNextTexture(GL3 gl, ShowYUVShader shader) {
         if (dataAvailable) {
-            transYUV2RGB();
-
-            int samplerLocation = gl.glGetUniformLocation(shader.getProgramID(), "textureSampler");
-            gl.glUniform1i(samplerLocation, 0);
+            int samplerLocationY = gl.glGetUniformLocation(shader.getProgramID(), "textureSamplerY");
+            gl.glUniform1i(samplerLocationY, 0);
             gl.glActiveTexture(GL3.GL_TEXTURE0);
-            gl.glBindTexture(GL3.GL_TEXTURE_2D, textureID.get(0));
+            gl.glBindTexture(GL3.GL_TEXTURE_2D, textureIDY.get(0));
             gl.glTexImage2D(
                     GL3.GL_TEXTURE_2D,
                     0,
-                    GL3.GL_RGB,
+                    GL3.GL_RED,
                     tex_width,
                     tex_height,
                     0,
-                    GL3.GL_RGB,
+                    GL3.GL_RED,
                     GL3.GL_UNSIGNED_BYTE,
-                    Buffers.newDirectByteBuffer(rgb));
+                    Buffers.newDirectByteBuffer(y));
+
+            int samplerLocationU = gl.glGetUniformLocation(shader.getProgramID(), "textureSamplerU");
+            gl.glUniform1i(samplerLocationU, 1);
+            gl.glActiveTexture(GL3.GL_TEXTURE1);
+            gl.glBindTexture(GL3.GL_TEXTURE_2D, textureIDU.get(0));
+            gl.glTexImage2D(
+                    GL3.GL_TEXTURE_2D,
+                    0,
+                    GL3.GL_RED,
+                    (tex_width / 2),
+                    (tex_height / 2),
+                    0,
+                    GL3.GL_RED,
+                    GL3.GL_UNSIGNED_BYTE,
+                    Buffers.newDirectByteBuffer(u));
+
+            int samplerLocationV = gl.glGetUniformLocation(shader.getProgramID(), "textureSamplerV");
+            gl.glUniform1i(samplerLocationV, 2);
+            gl.glActiveTexture(GL3.GL_TEXTURE2);
+            gl.glBindTexture(GL3.GL_TEXTURE_2D, textureIDV.get(0));
+            gl.glTexImage2D(
+                    GL3.GL_TEXTURE_2D,
+                    0,
+                    GL3.GL_RED,
+                    (tex_width / 2),
+                    (tex_height / 2),
+                    0,
+                    GL3.GL_RED,
+                    GL3.GL_UNSIGNED_BYTE,
+                    Buffers.newDirectByteBuffer(v));
 
             readYUV();
         }
     }
 
     public void dispose(GL3 gl) {
-        gl.glDeleteTextures(1, textureID);
+        gl.glDeleteTextures(1, textureIDY);
+        gl.glDeleteTextures(1, textureIDU);
+        gl.glDeleteTextures(1, textureIDV);
     }
 }

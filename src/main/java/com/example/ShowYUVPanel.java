@@ -21,10 +21,10 @@ public class ShowYUVPanel extends GLJPanel {
     };
 
     private final float[] VERTEX_DATA = {
-            -0.9f, -0.9f, 0.0f,
-            -0.9f, 0.9f, 0.0f,
-            0.9f, 0.9f, 0.0f,
-            0.9f, -0.9f, 0.0f,
+            -1.0f, -1.0f, 0.0f,
+            -1.0f, 1.0f, 0.0f,
+            1.0f, 1.0f, 0.0f,
+            1.0f, -1.0f, 0.0f,
     };
 
     private ShowYUVShader shader;

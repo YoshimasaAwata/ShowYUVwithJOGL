@@ -15,13 +15,26 @@ public class ShowYUVShader {
             " uv = vertexUV;\n" +
             "}";
     static final String FRAGMENT_SOURCE = "#version 330 core\n" +
+            "const mat4 TORGB = mat4(\n" +
+            "    1.164f,  1.164f, 1.164f, 0.0f,\n" +
+            "    0.0f,   -0.392f, 2.017f, 0.0f,\n" +
+            "    1.596f, -0.813f, 0.0f,   0.0f,\n" +
+            "    0.0f,    0.0f,   0.0f,   1.0f);\n" +
+            "const vec4 DIFF = vec4(16.0f / 255, 128.0f / 255, 128.0f / 255, 0.0f);\n" +
             "in vec2 uv;\n" +
             "out vec4 color;\n" +
-            "uniform sampler2D textureSampler;\n" +
+            "uniform sampler2D textureSamplerY;\n" +
+            "uniform sampler2D textureSamplerU;\n" +
+            "uniform sampler2D textureSamplerV;\n" +
             "void main(void)\n" +
             "{\n" +
-            " color = texture(textureSampler, uv);\n" +
-            // " color = vec4(1.0, 0.0, 0.0, 1.0);\n" +
+            "    vec4 fy = texture(textureSamplerY, uv);\n" +
+            "    vec4 fu = texture(textureSamplerU, uv);\n" +
+            "    vec4 fv = texture(textureSamplerV, uv);\n" +
+            "    vec4 yuv = vec4(fy.r, fu.r, fv.r, 1.0f);\n" +
+            "    yuv -= DIFF;\n" +
+            "    vec4 rgb = TORGB * yuv;\n" +
+            "    color = clamp(rgb, 0.0f, 1.0f);\n" +
             "}";
 
     static final String ERROR_VERTEX = "バーテックスシェーダー作成失敗";
